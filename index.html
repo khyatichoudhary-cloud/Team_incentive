@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incentive Calculator</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+    <!-- Main Calculator Container -->
+    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-lg mx-4">
+        <h1 class="text-3xl font-bold text-center mb-6 text-gray-800">Incentive Calculator</h1>
+
+        <!-- Input Fields -->
+        <div class="space-y-4">
+            
+            <div>
+                <label for="teamSelect" class="block text-sm font-medium text-gray-700 mb-1">Select Team</label>
+                <select id="teamSelect" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">-- Select a Team --</option>
+                    <option value="Fresh Leads">Fresh Leads</option>
+                    <option value="Lost Team">Lost Team</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="loginCount" class="block text-sm font-medium text-gray-700 mb-1">Login Count</label>
+                <input type="number" id="loginCount" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., 12">
+            </div>
+            <div>
+                <label for="disbursedAmount" class="block text-sm font-medium text-gray-700 mb-1">Disbursed Amount</label>
+                <input type="number" id="disbursedAmount" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., 250000">
+            </div>
+            <div>
+                <label for="queryResolved" class="block text-sm font-medium text-gray-700 mb-1">Query Resolved %</label>
+                <input type="number" id="queryResolved" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., 85">
+            </div>
+            <div>
+                <label for="needReview" class="block text-sm font-medium text-gray-700 mb-1">Need Review %</label>
+                <input type="number" id="needReview" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., 0.5">
+            </div>
+
+            <!-- Calculate Button -->
+            <button id="calculateBtn" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors duration-200 shadow-md">
+                Calculate Incentive
+            </button>
+        </div>
+
+        <!-- Results Display -->
+        <div id="results" class="mt-6 border-t pt-6 space-y-3">
+            <h2 class="text-xl font-bold text-gray-800">Results</h2>
+            <div class="space-y-2 text-gray-600">
+                <div class="flex justify-between items-center">
+                    <p class="font-medium">Team:</p>
+                    <span id="teamValue" class="font-semibold text-gray-800">N/A</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <p class="font-medium">Base Incentive:</p>
+                    <span id="baseValue" class="font-semibold text-gray-800">0.00</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <p class="font-medium">Query Resolved Amount:</p>
+                    <span id="queryValue" class="font-semibold text-gray-800">0.00</span>
+                </div>
+            </div>
+            <div class="border-t mt-4 pt-4">
+                <div class="flex justify-between items-center text-xl font-bold text-gray-800">
+                    <p>Total Incentive:</p>
+                    <span id="totalValue" class="text-blue-600">0.00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Get references to all input and output elements
+            const teamSelect = document.getElementById('teamSelect');
+            const loginCountInput = document.getElementById('loginCount');
+            const disbursedAmountInput = document.getElementById('disbursedAmount');
+            const queryResolvedInput = document.getElementById('queryResolved');
+            const needReviewInput = document.getElementById('needReview');
+            const calculateBtn = document.getElementById('calculateBtn');
+            const teamValue = document.getElementById('teamValue');
+            const baseValue = document.getElementById('baseValue');
+            const queryValue = document.getElementById('queryValue');
+            const totalValue = document.getElementById('totalValue');
+
+            calculateBtn.addEventListener('click', () => {
+                // Get the input values
+                const team = teamSelect.value;
+                const loginCount = parseInt(loginCountInput.value, 10);
+                const disbursedAmount = parseFloat(disbursedAmountInput.value);
+                const queryResolved = parseFloat(queryResolvedInput.value);
+                const needReview = parseFloat(needReviewInput.value);
+
+                // Initialize variables
+                let baseIncentive = 0;
+                let queryIncentive = 0;
+                let totalIncentive = 0;
+
+                // Input validation
+                if (!team) {
+                    teamValue.textContent = 'Please select a team.';
+                    baseValue.textContent = '0.00';
+                    queryValue.textContent = '0.00';
+                    totalValue.textContent = '0.00';
+                    return;
+                }
+
+                // 1. Calculate Base Incentive based on team and login count
+                if (team === 'Fresh Leads') {
+                    if (loginCount >= 31) {
+                        baseIncentive = Math.max(disbursedAmount * 0.0010, 1000);
+                    } else if (loginCount >= 21) {
+                        baseIncentive = Math.max(disbursedAmount * 0.0008, 1000);
+                    } else if (loginCount >= 16) {
+                        baseIncentive = Math.max(disbursedAmount * 0.0006, 1000);
+                    } else if (loginCount >= 10) {
+                        baseIncentive = Math.max(disbursedAmount * 0.0004, 1000);
+                    }
+                } else if (team === 'Lost Team') {
+                    if (loginCount >= 21) {
+                        baseIncentive = Math.max(disbursedAmount * 0.0012, 1000);
+                    } else if (loginCount >= 16) {
+                        baseIncentive = Math.max(disbursedAmount * 0.0010, 1000);
+                    } else if (loginCount >= 11) {
+                        baseIncentive = Math.max(disbursedAmount * 0.0008, 1000);
+                    } else if (loginCount >= 5) {
+                        baseIncentive = Math.max(disbursedAmount * 0.0006, 1000);
+                    }
+                }
+                
+                // 2. Calculate Query Incentive, but only if Base Incentive is not 0
+                // New logic: Also requires Query Resolved >= 80 and Need Review <= 1
+                if (baseIncentive > 0 && queryResolved >= 80 && needReview <= 1) {
+                    queryIncentive = disbursedAmount * 0.0001;
+                } else {
+                    queryIncentive = 0;
+                }
+
+                // 3. Calculate Total Incentive
+                totalIncentive = baseIncentive + queryIncentive;
+
+                // 4. Update the UI with the results, formatted to 2 decimal places
+                teamValue.textContent = team;
+                baseValue.textContent = baseIncentive.toFixed(2);
+                queryValue.textContent = queryIncentive.toFixed(2);
+                totalValue.textContent = totalIncentive.toFixed(2);
+            });
+        });
+    </script>
+</body>
+</html>
